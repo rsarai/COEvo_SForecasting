@@ -60,8 +60,9 @@ public class RBF {
 			for(int i=0; i < getNumberInput(); i++){
 				setNet1(j,getNet1()[j]+ (getWeights()[j][i] * getInputs()[i]));
 			}
-			
-			setFnet1(j, Math.exp((-0.5 * Math.pow(getNet1()[j] - getCenters()[j], 2) )/(getRadius()[j] * getRadius()[j])));
+			// Normalmente aqui se faria a distancia euclidiana entre getNet1 e getCenters, mas como o problema so
+			// tem uma dimensão isso foi simplificado para getNet1 - getCenters
+			setFnet1(j, Math.exp((-0.5 * (getNet1()[j] - getCenters()[j]) )/(getRadius()[j] * getRadius()[j])));
 		}
 
 		for(int j = 0; j < getNumberOutputs(); j++){
@@ -70,8 +71,7 @@ public class RBF {
 			for(int i = 0; i < getNumberHiddenNeurons(); i++){
 				setNet2(j, getNet2()[j] + (getWeights2()[j][i] * getFnet1()[i]));
 			}
-			eb=(double)(Math.exp((double)((-1.0d)*(getNet2()[j]))));
-			setNetout(j, (double) (1.0/(1.0+eb)));
+			setNetout(j, getNet2()[j]);
 		}
 		
 		return getNetout();
@@ -168,7 +168,7 @@ public class RBF {
 	public void setFnet1(int index, double value) {
 		fnet1[index]=value;
 	}
-
+	
 	public double [] getNetout() {
 		return netout;
 	}
