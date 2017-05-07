@@ -5,15 +5,36 @@ import java.util.List;
 
 public class Layer {
 	private List<Neuron> neuronios;
+	private Function function;
 	
-	public Layer(int numNeuronios){
+	public Layer(int numNeuronios, Function function){
 		this.neuronios = new ArrayList<>();
-		//add bias
+		this.function = function;
+		this.neuronios.add(new Neuron(numNeuronios, function, 1));
 		for (int i = 0; i < numNeuronios; i++){
-			this.neuronios.add(new Neuron(numNeuronios));
+			this.neuronios.add(new Neuron(numNeuronios, function));
 		}
 	}
 	
+	public Layer(double[] inputs, Function function){
+		this.neuronios = new ArrayList<>();
+		this.function = function;
+		this.neuronios.add(new Neuron(inputs.length, function, 1));
+		for (int i = 0; i < inputs.length; i++){
+			this.neuronios.add(new Neuron(inputs.length, function, inputs[i]));
+		}
+	}
+	
+	
+	
+	public Function getFunction() {
+		return function;
+	}
+
+	public void setFunction(Function function) {
+		this.function = function;
+	}
+
 	public Layer(List<Neuron> neurons){
 		this.neuronios = neurons;
 	}
@@ -24,15 +45,5 @@ public class Layer {
 
 	public void setNeuronions(List<Neuron> neuronions) {
 		this.neuronios = neuronions;
-	}
-	
-	//TODO
-	public double activationFunction(double value){
-		return 0;
-	}
-	
-	//TODO
-	public double derivate(double value){
-		return 0;
 	}
 }
