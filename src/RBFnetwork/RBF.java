@@ -8,7 +8,7 @@ public class RBF {
 	
 	private int numberInput = 3;
 	private int numberOutputs = 1;
-	private int numberHiddenNeurons = 4;
+	private int numberHiddenNeurons = 3;
 	private double [] centers;
 	private double [] radius;
 	private double [] inputs;
@@ -53,16 +53,14 @@ public class RBF {
 	}
 	
 	public double[] prevision(){
-		double eb;
 		for (int j=0;j<getNumberHiddenNeurons();j++) {
-			setNet1(j, getBias1()[j]);
 			
 			for(int i=0; i < getNumberInput(); i++){
 				setNet1(j,getNet1()[j]+ (getWeights()[j][i] * getInputs()[i]));
 			}
 			// Normalmente aqui se faria a distancia euclidiana entre getNet1 e getCenters, mas como o problema so
 			// tem uma dimensão isso foi simplificado para getNet1 - getCenters
-			setFnet1(j, Math.exp((-0.5 * (getNet1()[j] - getCenters()[j]) )/(getRadius()[j] * getRadius()[j])));
+			setFnet1(j, Math.exp((-0.5 * Math.pow(getNet1()[j] - getCenters()[j], 2) )/(getRadius()[j] * getRadius()[j])));
 		}
 
 		for(int j = 0; j < getNumberOutputs(); j++){
