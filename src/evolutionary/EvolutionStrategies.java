@@ -8,7 +8,7 @@ public class EvolutionStrategies {
 	private Function functionWrapper;
 	private List<Particle> population;
 	private static int iterations = 10000;
-	private static int numOffspring = 245;
+	private int numOffspring = 5;
 	private List<Particle> bestResults;
 	private Random random;
 	
@@ -37,6 +37,7 @@ public class EvolutionStrategies {
 			Particle best = selectBestFromPopulation();
 			population = new ArrayList<>();
 			population.add(best);
+//			this.numOffspring += 5;
 		}
 		
 	}
@@ -83,14 +84,9 @@ public class EvolutionStrategies {
 		double tl = 1/Math.sqrt(2 * 30);
 		double t = 1/Math.sqrt(2 * Math.sqrt(30));
 		for (int i = 0; i < 30; i++){
-			strategies[i] = p.getStrategy_parameters()[i] * Math.exp(tl * random.nextGaussian() + t * random.nextGaussian());
-			if (strategies[i] > this.functionWrapper.getTopDomainLimit()){
-				strategies[i] = this.functionWrapper.getTopDomainLimit();
-			}
-			
-			if (strategies[i] < this.functionWrapper.getBottomDomainLimit()){
-				strategies[i] = this.functionWrapper.getBottomDomainLimit();
-			}
+			strategies[i] = (p.getStrategy_parameters()[i] + p.getStrategy_parameters()[random.nextInt(30)]) / 2 * Math.exp(tl * random.nextGaussian() + t * random.nextGaussian());
+			verifyBound(strategies[i]);
+			//strategies[i] = Math.min(p.getStrategy_parameters()[i], strategies[i]);
 		}
 		return strategies;
 	}
