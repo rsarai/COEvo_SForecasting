@@ -19,7 +19,7 @@ public abstract class Function {
 		this.name = name;
 	}
 
-	public abstract double activationFunction(double[] value);
+//	public abstract double activationFunction(double[][] value);
 	
 	public double getBottomDomainLimit() {
 		return bottomDomainLimit;
@@ -36,5 +36,7 @@ public abstract class Function {
 	public void setTopDomainLimit(double topDomainLimit) {
 		this.topDomainLimit = topDomainLimit;
 	}
+
+	public abstract double activationFunction(double[][] current_position, double[] solution);
 }
  

@@ -1,44 +1,71 @@
 package evolutionary;
 
+import java.util.Random;
+
 public class Particle {
-	private double[] current_position;
+	private double[][] current_position;
+	private double[] solution;
 	private double[] strategy_parameters;
 	private double[] best_particle;
 	private double fitness;
 	private Function function_wrapper;
+	private MLP mlp;
 	
-	public Particle(Function f, double[] c, double[] s){
+	public Particle(Function f, double[][] c, double[] s, double[] sol){
 		this.function_wrapper = f;
 		this.current_position = c;
 		this.strategy_parameters = s;
+		this.solution = sol;
 		aply_function_on_current_position();
 	}
 	
 	public Particle(Function f){
 		this.function_wrapper = f;
 		this.current_position = getRandomPosition();
-		this.strategy_parameters = getRandomPosition();
-		this.fitness = f.activationFunction(current_position);
+		this.strategy_parameters = getRandomPositionStrategies();
+		this.fitness = f.activationFunction(current_position, this.solution);
 		aply_function_on_current_position();
 	}
 	
-	public double[] getRandomPosition(){
-		double [] position = new double[30];
-		for (int i = 0; i < 30; i++){
+	public double[] getRandomPositionStrategies(){
+		double [] position = new double[3];
+		for (int i = 0; i < 3; i++){
 			position[i] = function_wrapper.getBottomDomainLimit() + Math.random() * (function_wrapper.getTopDomainLimit() - function_wrapper.getBottomDomainLimit() );
 		}
 		return position;
 	}
 	
+	public double[][] getRandomPosition(){
+		/*for (int i = 0; i < 30; i++){
+			position[i] = function_wrapper.getBottomDomainLimit() + Math.random() * (function_wrapper.getTopDomainLimit() - function_wrapper.getBottomDomainLimit() );
+		}*/
+		Coevolution c = new Coevolution();
+		c.getDatabase();
+		double [][] position = new double[c.getTreinamentoSize()][3];
+		this.solution =  new double[c.getTreinamentoSize()];
+		Random r = new Random();
+		for (int j = 0; j < c.getTreinamentoSize(); j++){
+			int value = r.nextInt(c.getTeste().size() - 3);
+			for (int i = 0; i < 3; i++){
+				position[j][i] = Double.parseDouble(c.getTeste().get(value + i)); 
+			}
+			solution[j] = position[j][2];
+		}
+		return position;
+	}
+	
 	public void aply_function_on_current_position(){
-		this.fitness = this.function_wrapper.activationFunction(this.current_position);
+		this.fitness = this.function_wrapper.activationFunction(this.current_position, this.solution);
+		if (this.function_wrapper instanceof NeuralPrevision){
+			this.mlp = ((NeuralPrevision) this.function_wrapper).getMlp();
+		}
 	}
 
-	public double[] getCurrent_position() {
+	public double[][] getCurrent_position() {
 		return current_position;
 	}
 
-	public void setCurrent_position(double[] current_position) {
+	public void setCurrent_position(double[][] current_position) {
 		this.current_position = current_position;
 	}
 
@@ -72,5 +99,13 @@ public class Particle {
 
 	public void setFunction_wrapper(Function function_wrapper) {
 		this.function_wrapper = function_wrapper;
+	}
+
+	public double[] getSolution() {
+		return solution;
+	}
+
+	public void setSolution(double[] solution) {
+		this.solution = solution;
 	}
 }

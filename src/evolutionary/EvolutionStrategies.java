@@ -8,7 +8,9 @@ public class EvolutionStrategies {
 	private Function functionWrapper;
 	private List<Particle> population;
 	private static int iterations = 10000;
-	private int numOffspring = 5;
+	private static int dimensions = 3;
+	private int numOffspring = 1;
+	
 	private List<Particle> bestResults;
 	private Random random;
 	
@@ -19,7 +21,8 @@ public class EvolutionStrategies {
 		this.bestResults = new ArrayList<>();
 	}
 	
-	public void search(){
+	public MLP search(){
+		Particle best = null;
 		initializePopulation();
 		for (int i = 0; i < this.iterations; i++){
 			for (Particle p: this.population){
@@ -34,12 +37,21 @@ public class EvolutionStrategies {
 				newIndividuo.aply_function_on_current_position();
 				population.add(newIndividuo);
 			}
-			Particle best = selectBestFromPopulation();
+			best = selectBestFromPopulation();
 			population = new ArrayList<>();
 			population.add(best);
 //			this.numOffspring += 5;
+			
+			if (best.getFitness() == 0){
+				break;
+			}
 		}
-		
+		if (best.getFunction_wrapper() instanceof NeuralPrevision){
+			MLP m = ((NeuralPrevision) best.getFunction_wrapper()).getMlp();
+			System.out.println("Out: " + m.getOutput() + " ------ Espc: " + m.getEspected_output());
+			return m;
+		}
+		return null;
 	}
 	
 	public Particle selectBestFromPopulation(){
@@ -51,19 +63,19 @@ public class EvolutionStrategies {
 			}
 		}
 		bestResults.add(best);
-		System.out.println(best.getFitness());
+//		System.out.println(best.getFitness());
 		return best; 
 	}
 	
 	public Particle mutateOffspring(Particle offspring){
-		double[] currentPosition= new double[offspring.getCurrent_position().length];
+		double currentPosition = 0;
 		double[] strategyParameters = adaptStepsize(offspring);
 		
-		for (int i = 0; i < offspring.getCurrent_position().length; i++){
-			currentPosition[i] = offspring.getCurrent_position()[i] + strategyParameters[i] * random.nextGaussian();
-			currentPosition[i] = verifyBound(currentPosition[i]);
+		for (int i = 0; i < 3; i++){
+			currentPosition = offspring.getCurrent_position()[0][i] + strategyParameters[i] * random.nextGaussian();
+			offspring.getCurrent_position()[0][i] = verifyBound(currentPosition);
 		}
-		Particle p = new Particle(functionWrapper, currentPosition, strategyParameters);
+		Particle p = new Particle(functionWrapper, offspring.getCurrent_position(), strategyParameters, offspring.getSolution());
 		return p;
 	}
 	
@@ -80,11 +92,11 @@ public class EvolutionStrategies {
 	}
 	
 	public double[] adaptStepsize(Particle p){
-		double[] strategies = new double[30];
-		double tl = 1/Math.sqrt(2 * 30);
-		double t = 1/Math.sqrt(2 * Math.sqrt(30));
-		for (int i = 0; i < 30; i++){
-			strategies[i] = (p.getStrategy_parameters()[i] + p.getStrategy_parameters()[random.nextInt(30)]) / 2 * Math.exp(tl * random.nextGaussian() + t * random.nextGaussian());
+		double[] strategies = new double[dimensions];
+		double tl = 1/Math.sqrt(2 * dimensions);
+		double t = 1/Math.sqrt(2 * Math.sqrt(dimensions));
+		for (int i = 0; i < dimensions; i++){
+			strategies[i] = (p.getStrategy_parameters()[i] + p.getStrategy_parameters()[random.nextInt(dimensions)]) / 2 * Math.exp(tl * random.nextGaussian() + t * random.nextGaussian());
 			verifyBound(strategies[i]);
 			//strategies[i] = Math.min(p.getStrategy_parameters()[i], strategies[i]);
 		}
