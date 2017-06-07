@@ -5,6 +5,7 @@ import java.util.Random;
 public class MLP{
 	private static double bias1[];
 	private static double bias2[];
+	private static Coevolution c = new Coevolution();
 
 	private static double antigodeltabs1[];
 	private static double antigodeltabs2[];
@@ -903,7 +904,8 @@ public class MLP{
 	public static double prevision() {
 		double[] net1 = new double[getNumHidden()];
 		double[] fnet1 = new double[getNumHidden()];
-		Coevolution c = new Coevolution();
+		double[][] netout = new double[c.getTreinamentoSize()][getNumOutputs()];
+		
 		double ea = 0;
 		for(int k = 0; k < c.getTreinamentoSize(); k++){
 			for (int j=0;j<getNumHidden();j++) {
@@ -921,7 +923,6 @@ public class MLP{
 	
 			double[] net2 = new double[getNumOutputs()];
 			double eb = 0;
-			double[][] netout = new double[c.getTreinamentoSize()][getNumOutputs()];
 			for(int j=0;j<getNumOutputs();j++)
 			{
 				net2[j] = getBias2(j);
@@ -935,9 +936,16 @@ public class MLP{
 			}
 		}
 		//System.out.println("Out" + netout[0] +" ----- Saida" + saidas[0]);
-		setEspected_output(saidas[0]);
 		setOutput(netout);
-		return Math.abs(netout[0][0] - saidas[0]);
+		return errorOfNetowork(netout, saidas);
+	}
+	
+	public static double errorOfNetowork(double[][] netout, double[] espect){
+		double result = 0;
+		for (int i = 0; i < espect.length ; i++){
+			result += Math.pow(netout[i][0] - espect[i], 2);
+		}
+		return Math.sqrt(result);
 	}
 
 	public static double[][] getOutput() {
@@ -955,5 +963,20 @@ public class MLP{
 	public static void setEspected_output(double e) {
 		espected_output = e;
 	}
-
+	
+	public double evaluateNetwork(){
+		Coevolution c = new Coevolution();
+		double [][] input = new double[c.getTestSize()][3];
+		double[] output=  new double[c.getTestSize()];
+		for (int j = 0; j < c.getTestSize() - 3; j++){
+			for (int i = 0; i < 2; i++){
+				input[j][i] = (c.getTreinamento().get(j + i)); 
+			}
+			output[j] = input[j][2];
+		}
+		setEntradas(input);
+		setSaida(output);
+		return prevision();
+	}
+	
 }

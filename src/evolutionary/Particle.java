@@ -45,9 +45,9 @@ public class Particle {
 		this.solution =  new double[c.getTreinamentoSize()];
 		Random r = new Random();
 		for (int j = 0; j < c.getTreinamentoSize(); j++){
-			int value = r.nextInt(c.getTeste().size() - 3);
+			int value = r.nextInt(c.getTreinamento().size() - 3);
 			for (int i = 0; i < 3; i++){
-				position[j][i] = Double.parseDouble(c.getTeste().get(value + i)); 
+				position[j][i] = (c.getTreinamento().get(value + i)); 
 			}
 			solution[j] = position[j][2];
 		}
@@ -55,10 +55,15 @@ public class Particle {
 	}
 	
 	public void aply_function_on_current_position(){
-		this.fitness = this.function_wrapper.activationFunction(this.current_position, this.solution);
-		if (this.function_wrapper instanceof NeuralPrevision){
+		double error = 0;
+		double v = this.function_wrapper.activationFunction(this.current_position, this.solution);
+		if (v < this.fitness){
+			this.fitness = v;
 			this.mlp = ((NeuralPrevision) this.function_wrapper).getMlp();
 		}
+		this.setMlp(((NeuralPrevision) this.function_wrapper).getMlp());
+		error = this.mlp.evaluateNetwork();
+		this.fitness = this.fitness + error;
 	}
 
 	public double[][] getCurrent_position() {
@@ -107,5 +112,13 @@ public class Particle {
 
 	public void setSolution(double[] solution) {
 		this.solution = solution;
+	}
+
+	public MLP getMlp() {
+		return mlp;
+	}
+
+	public void setMlp(MLP mlp) {
+		this.mlp = mlp;
 	}
 }

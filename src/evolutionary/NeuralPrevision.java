@@ -23,7 +23,7 @@ public class NeuralPrevision extends Function{
 		mlp.setEntradas(value);
 		mlp.setSaida(saidas);
 		mlp.Forward();
-		
+		this.setMlp(mlp);
 		return mlp.prevision();
 	}
 
